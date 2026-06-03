@@ -118,15 +118,28 @@ header small{font-size:11px;opacity:.75;display:block;margin-top:1px;}
 .fp-size{font-size:12px;color:var(--muted);margin-top:2px;}
 .fp-remove{background:none;border:none;cursor:pointer;font-size:18px;color:var(--muted);padding:4px;flex-shrink:0;}
 
-/* ── Process Button ── */
+/* ── Process Button (fixed bottom) ── */
+.process-btn-wrap{
+  position:fixed;
+  bottom:calc(var(--sb) + 66px);
+  left:0;right:0;
+  padding:10px 14px;
+  background:linear-gradient(to top, var(--bg) 70%, transparent);
+  z-index:150;
+  display:none;
+}
+.process-btn-wrap.visible{ display:block; }
 .process-btn{
   width:100%;padding:16px;background:var(--p);color:#fff;
   border:none;border-radius:14px;font-size:16px;font-weight:700;
   cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
-  transition:opacity .2s,transform .1s;margin-top:12px;
+  transition:opacity .2s,transform .1s;
+  box-shadow:0 4px 20px rgba(79,110,247,.45);
 }
 .process-btn:active{transform:scale(.97);}
 .process-btn:disabled{opacity:.5;cursor:not-allowed;}
+/* 버튼 공간만큼 아래 여백 확보 */
+.process-btn-spacer{ height:74px; }
 
 /* ── Progress ── */
 .progress-card{
@@ -308,7 +321,11 @@ header small{font-size:11px;opacity:.75;display:block;margin-top:1px;}
       <button class="fp-remove" onclick="removeFile()" title="파일 제거">✕</button>
     </div>
 
-    <!-- 변환 버튼 -->
+    <div class="process-btn-spacer"></div>
+  </div>
+
+  <!-- 변환 버튼 (하단 고정) -->
+  <div class="process-btn-wrap" id="process-btn-wrap">
     <button class="process-btn" id="process-btn" onclick="processFile()" disabled>
       <span>✨</span> 변환 및 요약 시작
     </button>
@@ -424,6 +441,9 @@ let selectedFile = null;
 let currentDetail = null;
 
 /* ── Init ── */
+// 초기에 업로드 탭이 활성화이므로 버튼 바로 표시
+document.getElementById('process-btn-wrap').classList.add('visible');
+
 const today = new Date();
 document.getElementById('m-date').value =
   today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
@@ -468,6 +488,8 @@ function showPage(name){
   if(tab) tab.classList.add('active');
   else document.getElementById('tab-list').classList.add('active');
   if(name==='list') renderList();
+  // 업로드 페이지일 때만 하단 버튼 표시
+  document.getElementById('process-btn-wrap').classList.toggle('visible', name==='upload');
 }
 
 /* ── File Handling ── */
